@@ -7,7 +7,7 @@ import ReactNative, {
   DeviceEventEmitter,
   Keyboard,
   NativeModules,
-  InteractionManager
+  TextInput,
 } from 'react-native';
 
 const ScrollViewManager = NativeModules.ScrollViewManager;
@@ -78,25 +78,16 @@ export default class KeyboardAwareBase extends Component {
   }
   
   _scrollToFocusedTextInput() {
-    if (this.props.getTextInputRefs) {
-      const textInputRefs = this.props.getTextInputRefs();
-      textInputRefs.some((textInputRef, index, array) => {
-        const isFocusedFunc = textInputRef.isFocused();
-        const isFocused = isFocusedFunc && (typeof isFocusedFunc === "function") ? isFocusedFunc() : isFocusedFunc;
-        if (isFocused) {
-          setTimeout(() => {
-            this._keyboardAwareView.getScrollResponder().scrollResponderScrollNativeHandleToKeyboard(
-              ReactNative.findNodeHandle(textInputRef), this.props.scrollToInputAdditionalOffset, true);
-          }, 0);
-        }
-        return isFocused;
-      });
+    const currentlyFocusedField = TextInput.State.currentlyFocusedField()
+    if (currentlyFocusedField) {
+      setTimeout(() => {
+        this._keyboardAwareView.getScrollResponder().scrollResponderScrollNativeHandleToKeyboard(
+          currentlyFocusedField, this.props.scrollToInputAdditionalOffset, true);
+      }, 0);
     }
   }
   
   _onKeyboardWillShow(event) {
-    this._scrollToFocusedTextInput();
-    
     const newKeyboardHeight = event.endCoordinates.height;
     if (this.state.keyboardHeight === newKeyboardHeight) {
       return;
