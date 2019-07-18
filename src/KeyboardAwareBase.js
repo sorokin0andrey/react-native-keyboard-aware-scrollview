@@ -8,6 +8,7 @@ import ReactNative, {
   Keyboard,
   NativeModules,
   TextInput,
+  findNodeHandle,
 } from 'react-native';
 
 const ScrollViewManager = NativeModules.ScrollViewManager;
@@ -83,6 +84,15 @@ export default class KeyboardAwareBase extends Component {
       setTimeout(() => {
         this._keyboardAwareView.getScrollResponder().scrollResponderScrollNativeHandleToKeyboard(
           currentlyFocusedField, this.props.scrollToInputAdditionalOffset, true);
+      }, 0);
+    }
+  }
+
+  _scrollToView(ref, offset = 0) {
+    if (ref) {
+      setTimeout(() => {
+        this._keyboardAwareView.getScrollResponder().scrollResponderScrollNativeHandleToKeyboard(
+          findNodeHandle(ref), offset || this.props.scrollToInputAdditionalOffset, true);
       }, 0);
     }
   }
